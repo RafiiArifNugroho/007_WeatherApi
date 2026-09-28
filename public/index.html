@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Location Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background-color: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #dbeafe;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #0f172a;
+        }
+
+        .header p {
+            margin-top: 6px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+        }
+
+        .search-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-box input {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #0f172a;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        .search-box input:focus {
+            background-color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .search-box button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border: 1px solid #2563eb;
+            border-radius: 8px;
+            background-color: #2563eb;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .search-box button:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        .search-box button:active {
+            transform: scale(0.98);
+        }
+
+        #lokasi {
+            margin-top: 14px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #334155;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            word-break: break-word;
+        }
+
+        #lokasi:empty {
+            display: none;
+        }
+
+        #lokasi.error {
+            color: #b91c1c;
+            background-color: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        #lokasi iconify-icon {
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .section-title {
+            margin: 22px 0 12px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-title iconify-icon {
+            color: #2563eb;
+            font-size: 16px;
+        }
+
+        .data-grid,
+        .coordinate-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .data-item {
+            padding: 12px 14px;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            transition: border-color 0.15s ease;
+        }
+
+        .data-item:hover {
+            border-color: #cbd5e1;
+        }
+
+        .data-item.full {
+            grid-column: span 2;
+        }
+
+        .data-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 5px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .data-label iconify-icon {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .data-value {
+            display: block;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        iconify-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 540px) {
+            body {
+                padding: 16px 12px;
+                display: block;
+            }
+
+            .card {
+                padding: 18px 14px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box button {
+                width: 100%;
+            }
+
+            .data-grid,
+            .coordinate-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-item.full {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">
+                <iconify-icon icon="lucide:compass" width="28" height="28"></iconify-icon>
+            </div>
+            <h1>Location Finder</h1>
+            <p>Cari lokasi dan lihat informasi wilayah</p>
+        </div>
+
+        <div class="card">
+            <label class="search-label" for="input-lokasi">Cari Lokasi</label>
+            <div class="search-box">
+                <input id="input-lokasi" type="text" placeholder="Contoh: Kasihan, Bantul" value="Jakarta" />
+                <button id="btn-cari">
+                    <iconify-icon icon="lucide:search" width="16" height="16"></iconify-icon>
+                    Cari
+                </button>
+            </div>
+
+            <p id="lokasi"></p>
+
+            <h2 class="section-title">
+                <iconify-icon icon="lucide:map" width="16" height="16"></iconify-icon>
+                Informasi Wilayah
+            </h2>
+            <div class="data-grid">
+                <div class="data-item">
+                    <span class="data-label">
+                        <iconify-icon icon="lucide:globe" width="14" height="14"></iconify-icon>
+                        Negara
+                    </span>
+                    <span class="data-value" id="negara">-</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">
+                        <iconify-icon icon="lucide:landmark" width="14" height="14"></iconify-icon>
+                        Provinsi
+                    </span>
+                    <span class="data-value" id="provinsi">-</span>
+                </div>
+                <div class="data-item full">
+                    <span class="data-label">
+                        <iconify-icon icon="lucide:building-2" width="14" height="14"></iconify-icon>
+                        Kecamatan
+                    </span>
+                    <span class="data-value" id="kecamatan">-</span>
+                </div>
+            </div>
+
+            <h2 class="section-title">
+                <iconify-icon icon="lucide:crosshair" width="16" height="16"></iconify-icon>
+                Koordinat
+            </h2>
+            <div class="coordinate-grid">
+                <div class="data-item">
+                    <span class="data-label">
+                        <iconify-icon icon="lucide:move-horizontal" width="14" height="14"></iconify-icon>
+                        Longitude
+                    </span>
+                    <span class="data-value" id="longitude">-</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">
+                        <iconify-icon icon="lucide:move-vertical" width="14" height="14"></iconify-icon>
+                        Latitude
+                    </span>
+                    <span class="data-value" id="latitude">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Powered by MapTiler API
+        </div>
+    </div>
+
+    <script>
+        function cariLokasi() {
+            const q = document.getElementById("input-lokasi").value.trim();
+            const info = document.getElementById("lokasi");
+
+            if (!q) {
+                info.className = "error";
+                info.innerHTML = '<iconify-icon icon="lucide:alert-circle" width="16" height="16"></iconify-icon><span>Masukkan lokasi terlebih dahulu.</span>';
+                return;
+            }
+
+            info.className = "";
+            info.innerHTML = '<iconify-icon icon="lucide:loader-2" class="spin" width="16" height="16"></iconify-icon><span>Mencari lokasi...</span>';
+
+            fetch("/api/lokasi?q=" + encodeURIComponent(q))
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.message) {
+                        info.className = "error";
+                        info.innerHTML = '<iconify-icon icon="lucide:alert-circle" width="16" height="16"></iconify-icon><span>' + data.message + '</span>';
+                        return;
+                    }
+
+                    const lon = data.longitude ?? (data.koordinat ? data.koordinat[0] : "-");
+                    const lat = data.latitude ?? (data.koordinat ? data.koordinat[1] : "-");
+
+                    const tempat = data.lokasi || data.kota || "";
+                    info.innerHTML = '<iconify-icon icon="lucide:map-pin" width="16" height="16"></iconify-icon><span>' + tempat + '</span>';
+                    document.getElementById("negara").textContent = data.negara || "-";
+                    document.getElementById("provinsi").textContent = data.provinsi || "-";
+                    document.getElementById("kecamatan").textContent = data.kecamatan || "-";
+                    document.getElementById("longitude").textContent = lon;
+                    document.getElementById("latitude").textContent = lat;
+                })
+                .catch(() => {
+                    info.className = "error";
+                    info.innerHTML = '<iconify-icon icon="lucide:alert-circle" width="16" height="16"></iconify-icon><span>Tidak dapat terhubung ke server.</span>';
+                });
+        }
+
+        document.getElementById("btn-cari").addEventListener("click", cariLokasi);
+
+        document.getElementById("input-lokasi").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                cariLokasi();
+            }
+        });
+
+        cariLokasi();
+    </script>
+</body>
+</html>
